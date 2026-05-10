@@ -1,0 +1,39 @@
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.apk
+*.aab
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Firebase service account keys
+*.json
+!firestore.rules
+!firestore.indexes.json
+
+# Netlify
+.netlify/
+
+# Logs
+logs/
+*.log

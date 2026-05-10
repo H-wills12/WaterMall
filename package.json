@@ -1,0 +1,27 @@
+{
+  "name": "watermall",
+  "version": "2.0.0",
+  "description": "Water supply management platform with Paystack & Kora integration",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve .",
+    "deploy": "netlify deploy --prod",
+    "firebase:deploy": "firebase deploy --only firestore"
+  },
+  "keywords": [
+    "water supply",
+    "distribution",
+    "paystack",
+    "kora",
+    "mobile money",
+    "retailer management",
+    "africa"
+  ],
+  "author": "WaterMall",
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0",
+    "netlify-cli": "^17.0.0"
+  }
+}

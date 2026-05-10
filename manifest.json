@@ -1,0 +1,22 @@
+{
+  "name": "WaterMall",
+  "short_name": "WaterMall",
+  "description": "Water Supply Management Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0F5B5A",
+  "background_color": "#F4F9FC",
+  "icons": [
+    {
+      "src": "https://watermall.app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://watermall.app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
