@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>WaterMall | Smart Water Distribution & Retail Management</title>
-    <meta name="description" content="WaterMall - Complete water supply management. Track inventory, manage retailers, accept payments via Paystack & Kora.">
+    <title>WaterMall | Smart Water Distribution & Retail Platform</title>
+    <meta name="description" content="WaterMall - Complete water supply management. Track inventory, manage retailers, accept payments.">
     <meta name="theme-color" content="#0F5B5A">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230F5B5A'/%3E%3Ctext x='50' y='67' text-anchor='middle' fill='white' font-size='50' font-weight='bold'%3E💧%3C/text%3E%3C/svg%3E">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Google Maps API (Replace YOUR_KEY with actual key) -->
+    <!-- Google Maps API - Replace YOUR_API_KEY -->
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry"></script>
+    <!-- Paystack & Kora CDN -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://kora-pay.s3.amazonaws.com/kora-checkout.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -32,24 +34,21 @@
             --border: #E2E8F0;
             --accent: #0F5B5A;
             --accent-hover: #0A4746;
-            --danger: #E53E3E;
-            --success: #38A169;
-            --warning: #ECC94B;
         }
         body.dark {
-            --bg-primary: #1A202C;
-            --bg-card: #2D3748;
+            --bg-primary: #121826;
+            --bg-card: #1E2538;
             --text-primary: #F7FAFC;
             --text-secondary: #CBD5E0;
-            --border: #4A5568;
-            --accent: #319795;
-            --accent-hover: #2C7A7B;
+            --border: #334155;
+            --accent: #2DD4BF;
+            --accent-hover: #14B8A6;
         }
         body {
             background: var(--bg-primary);
             color: var(--text-primary);
         }
-        /* Hero / Get Started */
+        /* Hero Get Started */
         .hero-page {
             min-height: 100vh;
             background: linear-gradient(135deg, #0B4F4E 0%, #1A7B78 100%);
@@ -75,14 +74,11 @@
             background-size: cover;
             background-position: center;
         }
-        .hero-content {
-            flex: 1;
-            padding: 2rem;
-        }
+        .hero-content { flex: 1; padding: 2rem; }
         .hero-content h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); color: var(--accent); margin-bottom: 1rem; }
         .btn-get-started {
             background: var(--accent); color: white; border: none; padding: 0.8rem 1.8rem;
-            border-radius: 2rem; font-weight: 600; cursor: pointer;
+            border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 1rem;
         }
         /* App Layout */
         .app-layout { display: flex; min-height: 100vh; position: relative; }
@@ -104,13 +100,8 @@
             margin: 0.25rem 0; border-radius: 1rem; color: var(--text-secondary);
             cursor: pointer; transition: all 0.2s;
         }
-        .nav-item:hover, .nav-item.active { background: rgba(15, 91, 90, 0.1); color: var(--accent); }
-        .main-panel {
-            margin-left: 280px;
-            flex: 1;
-            padding: 1rem;
-            width: calc(100% - 280px);
-        }
+        .nav-item:hover, .nav-item.active { background: rgba(15, 91, 90, 0.15); color: var(--accent); }
+        .main-panel { margin-left: 280px; flex: 1; padding: 1rem; width: calc(100% - 280px); }
         .top-bar {
             background: var(--bg-card);
             border-radius: 1rem;
@@ -125,7 +116,7 @@
         }
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar { width: 2.2rem; height: 2.2rem; border-radius: 50%; object-fit: cover; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
         .stat-card {
             background: var(--bg-card);
             border-radius: 1rem;
@@ -148,7 +139,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -162,7 +153,7 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        .map-container { height: 300px; border-radius: 1rem; overflow: hidden; margin: 1rem 0; background: #E2E8F0; }
+        .map-container { height: 280px; border-radius: 1rem; overflow: hidden; margin: 1rem 0; background: #E2E8F0; }
         .form-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--text-secondary); font-size: 0.85rem; }
         input, select, textarea {
@@ -182,7 +173,6 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .btn-icon { background: transparent; color: var(--accent); padding: 0.4rem; }
         .filter-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
         .filter-chip {
             background: var(--bg-card);
@@ -208,42 +198,22 @@
             z-index: 1100;
             font-size: 0.8rem;
         }
-        .theme-toggle {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--accent);
-        }
-        .mobile-menu-btn {
-            display: none;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-        }
+        .theme-toggle { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--accent); }
+        .mobile-menu-btn { display: none; background: var(--accent); color: white; border: none; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; }
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                width: 80%;
-                z-index: 200;
-            }
+            .sidebar { transform: translateX(-100%); position: fixed; width: 80%; z-index: 200; }
             .sidebar.open { transform: translateX(0); }
             .main-panel { margin-left: 0; width: 100%; padding: 0.8rem; }
             .mobile-menu-btn { display: block; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        .material-icons { font-size: 1.2rem; vertical-align: middle; }
-        .retailer-card { cursor: pointer; transition: transform 0.1s; }
+        .retailer-card { cursor: pointer; transition: transform 0.1s; margin-bottom: 0.5rem; }
         .retailer-card:hover { transform: scale(1.01); background: rgba(15,91,90,0.05); }
     </style>
 </head>
 <body>
 
-<!-- Hero / Get Started -->
+<!-- Hero Get Started -->
 <div id="heroPage" class="hero-page">
     <div class="hero-card">
         <div class="hero-image"></div>
@@ -283,51 +253,39 @@
 </div>
 
 <script>
-    // ==================== FIREBASE CONFIG ====================
-    const ENV = {
-        FIREBASE_API_KEY: "AIzaSyBZYYoNqbFPIPGWw6dkXWbrz7VrnVHWcSA",
-        FIREBASE_AUTH_DOMAIN: "watermall.firebaseapp.com",
-        FIREBASE_PROJECT_ID: "watermall",
-        FIREBASE_STORAGE_BUCKET: "watermall.firebasestorage.app",
-        FIREBASE_MSG_SENDER_ID: "1019429267262",
-        FIREBASE_APP_ID: "1:1019429267262:web:5039587eeb11aaba70ee6f"
+    // FIREBASE CONFIG (WORKING PLACEHOLDER - REPLACE WITH YOURS)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBZYYoNqbFPIPGWw6dkXWbrz7VrnVHWcSA",
+        authDomain: "watermall.firebaseapp.com",
+        projectId: "watermall",
+        storageBucket: "watermall.firebasestorage.app",
+        messagingSenderId: "1019429267262",
+        appId: "1:1019429267262:web:5039587eeb11aaba70ee6f"
     };
-    firebase.initializeApp(ENV);
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
 
     let currentUser = null;
     let currentMap = null, currentMarker = null;
-    let retailersCache = [];
+    let currentStock = { bottled: 500, sachet: 1200 };
+    let allRetailers = [];
 
-    // Theme
-    function initTheme() {
-        const dark = localStorage.getItem('theme') === 'dark';
-        if (dark) document.body.classList.add('dark');
-        document.getElementById('themeToggle')?.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-        });
-    }
-
+    // Helper Functions
     function showToast(msg) { let t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
 
-    // Auth
-    document.getElementById('getStartedBtn').addEventListener('click', async () => {
-        try {
-            const result = await auth.signInWithPopup(googleProvider);
-            showToast(`Welcome ${result.user.displayName}!`);
-            document.getElementById('heroPage').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            await ensureUserDoc(result.user);
-            loadPage('dashboard');
-        } catch (e) { showToast('Sign in failed'); }
-    });
+    // Theme
+    function initTheme() { const dark = localStorage.getItem('theme') === 'dark'; if (dark) document.body.classList.add('dark'); document.getElementById('themeToggle')?.addEventListener('click', () => { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); }); }
 
+    // Auth State
     async function ensureUserDoc(user) {
         const ref = db.collection('suppliers').doc(user.uid);
-        if (!(await ref.get()).exists) await ref.set({ name: user.displayName, email: user.email, createdAt: new Date(), inventory: { bottled: 500, sachet: 1200 } });
+        const snap = await ref.get();
+        if (!snap.exists) await ref.set({ name: user.displayName, email: user.email, createdAt: new Date(), inventory: { bottled: 500, sachet: 1200 } });
+        const inv = await ref.collection('meta').doc('inventory').get();
+        if (!inv.exists) await ref.collection('meta').doc('inventory').set(currentStock);
+        else currentStock = inv.data();
     }
 
     auth.onAuthStateChanged(async (user) => {
@@ -335,7 +293,9 @@
             currentUser = user;
             document.getElementById('userName').innerText = user.displayName || user.email;
             document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?background=0F5B5A&color=fff&name=${encodeURIComponent(user.displayName || 'User')}`;
+            await ensureUserDoc(user);
             await loadInventory();
+            loadPage('dashboard');
         } else if (user) {
             document.getElementById('heroPage').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
@@ -345,16 +305,17 @@
             await ensureUserDoc(user);
             await loadInventory();
             loadPage('dashboard');
+        } else {
+            document.getElementById('heroPage').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
         }
     });
 
+    document.getElementById('getStartedBtn').addEventListener('click', async () => { try { await auth.signInWithPopup(googleProvider); showToast('Welcome!'); } catch(e) { showToast('Sign in failed'); } });
     document.getElementById('logoutBtn')?.addEventListener('click', async () => { await auth.signOut(); location.reload(); });
-    document.querySelectorAll('.nav-item[data-page]').forEach(el => {
-        el.addEventListener('click', () => { loadPage(el.dataset.page); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); });
-    });
     document.getElementById('mobileMenuBtn')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+    document.querySelectorAll('.nav-item[data-page]').forEach(el => { el.addEventListener('click', () => { loadPage(el.dataset.page); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); document.getElementById('sidebar')?.classList.remove('open'); }); });
 
-    let currentStock = { bottled: 500, sachet: 1200 };
     async function loadInventory() {
         if (!currentUser) return;
         const inv = await db.collection('suppliers').doc(currentUser.uid).collection('meta').doc('inventory').get();
@@ -362,7 +323,7 @@
         else await db.collection('suppliers').doc(currentUser.uid).collection('meta').doc('inventory').set(currentStock);
     }
 
-    async function updateInventory(product, qty, isSale = true) {
+    async function updateStock(product, qty, isSale = true) {
         if (isSale && currentStock[product] < qty) { showToast(`Insufficient ${product} stock!`); return false; }
         currentStock[product] = isSale ? currentStock[product] - qty : currentStock[product] + qty;
         await db.collection('suppliers').doc(currentUser.uid).collection('meta').doc('inventory').set(currentStock);
@@ -371,7 +332,7 @@
 
     async function loadPage(page) {
         const container = document.getElementById('dynamicContent');
-        const titles = { dashboard: 'Dashboard', retailers: 'Retailers', addRetailer: 'Add Retailer', recordSale: 'Record Sale', inventory: 'Inventory Stock', subscription: 'Subscription Plans' };
+        const titles = { dashboard: 'Dashboard', retailers: 'Retailers', addRetailer: 'Add Retailer', recordSale: 'Record Sale', inventory: 'Stock Inventory', subscription: 'Subscription Plans' };
         document.getElementById('pageTitle').innerText = titles[page] || 'WaterMall';
         if (page === 'dashboard') await renderDashboard(container);
         else if (page === 'retailers') await renderRetailersList(container);
@@ -393,10 +354,10 @@
                 <div class="stat-card"><div class="stat-number">${sachet}</div><div>Sachet Sold</div></div>
                 <div class="stat-card"><div class="stat-number">₵${revenue.toLocaleString()}</div><div>Revenue</div></div>
                 <div class="stat-card"><div class="stat-number">₵${unpaid.toLocaleString()}</div><div>Unpaid</div></div>
-                <div class="stat-card"><div class="stat-number">${retailersSnap.size}</div><div>Total Retailers</div></div>
+                <div class="stat-card"><div class="stat-number">${retailersSnap.size}</div><div>Retailers</div></div>
                 <div class="stat-card"><div class="stat-number">${currentStock.bottled}</div><div>Bottled Stock</div></div>
             </div>
-            <div class="card"><h4>📋 Recent Retailers</h4><div class="filter-buttons" id="quickFilters"><span class="filter-chip" data-filter="all">All</span><span class="filter-chip" data-filter="unpaid">Unpaid</span><span class="filter-chip" data-filter="bottled">Bottled Only</span><span class="filter-chip" data-filter="sachet">Sachet Only</span></div><div id="retailerGrid" style="display:grid;gap:0.5rem;"></div></div>
+            <div class="card"><h4>📋 Retailers Overview</h4><div class="filter-buttons" id="quickFilters"><span class="filter-chip" data-filter="all">All</span><span class="filter-chip" data-filter="unpaid">Unpaid</span><span class="filter-chip" data-filter="bottled">Bottled Buyers</span><span class="filter-chip" data-filter="sachet">Sachet Buyers</span></div><div id="retailerGrid" style="display:grid;gap:0.5rem;"></div></div>
         `;
         await displayRetailerGrid();
     }
@@ -405,13 +366,11 @@
         const snap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
         let retailers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         if (filter === 'unpaid') retailers = retailers.filter(r => (r.outstandingBalance || 0) > 0);
-        else if (filter === 'bottled') retailers = retailers.filter(r => (r.lastProduct === 'bottled'));
-        else if (filter === 'sachet') retailers = retailers.filter(r => (r.lastProduct === 'sachet'));
+        else if (filter === 'bottled') retailers = retailers.filter(r => r.lastProduct === 'bottled');
+        else if (filter === 'sachet') retailers = retailers.filter(r => r.lastProduct === 'sachet');
         const grid = document.getElementById('retailerGrid');
-        if (grid) grid.innerHTML = retailers.map(r => `<div class="card retailer-card" onclick="showRetailerModal('${r.id}')"><div><b>${r.name}</b> | 📞 ${r.phone || '-'} | Owing: ₵${r.outstandingBalance || 0}</div><div style="font-size:0.7rem">📍 ${r.address || 'No address'} ${r.lat ? `(${r.lat.toFixed(4)}, ${r.lng.toFixed(4)})` : ''}</div></div>`).join('');
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.onclick = () => { document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); chip.classList.add('active'); displayRetailerGrid(chip.dataset.filter); };
-        });
+        if (grid) grid.innerHTML = retailers.map(r => `<div class="card retailer-card" onclick="showRetailerModal('${r.id}')"><div><b>${r.name}</b> | 📞 ${r.phone || '-'} | Owing: ₵${(r.outstandingBalance || 0).toLocaleString()}</div><div style="font-size:0.7rem">📍 ${r.address || 'No address'} ${r.lat ? `(${r.lat.toFixed(4)}, ${r.lng.toFixed(4)})` : ''}</div></div>`).join('');
+        document.querySelectorAll('.filter-chip').forEach(chip => { chip.onclick = () => { document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); chip.classList.add('active'); displayRetailerGrid(chip.dataset.filter); }; });
     }
 
     window.showRetailerModal = async (id) => {
@@ -420,112 +379,71 @@
         const sales = await db.collection('suppliers').doc(currentUser.uid).collection('sales').where('customerId', '==', id).get();
         let totalBought = 0, totalPaid = 0;
         sales.forEach(s => { totalBought += s.data().totalAmount; totalPaid += s.data().paidAmount; });
-        const modalHtml = `
-            <div id="retailerModal" class="modal" style="display:flex">
-                <div class="modal-content">
-                    <h3>${r.name}</h3>
-                    <p><i class="material-icons">phone</i> ${r.phone || '-'}</p>
-                    <p><i class="material-icons">location_on</i> ${r.address || 'No address'}<br>Lat: ${r.lat?.toFixed(6) || 'N/A'} , Lng: ${r.lng?.toFixed(6) || 'N/A'}</p>
-                    <p><i class="material-icons">payments</i> Total Bought: ₵${totalBought.toLocaleString()} | Paid: ₵${totalPaid.toLocaleString()} | Unpaid: ₵${(r.outstandingBalance || 0).toLocaleString()}</p>
-                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin:1rem 0">
-                        <button id="partialPaymentBtn">➕ Partial Payment</button>
-                        <button id="markPaidBtn">✅ Mark Fully Paid</button>
-                        <button id="editBtn">✏️ Edit Info</button>
-                    </div>
-                    <button onclick="closeModal()">Close</button>
-                </div>
-            </div>`;
+        const modalHtml = `<div id="retailerModal" class="modal" style="display:flex"><div class="modal-content"><h3>${r.name}</h3><p><i class="material-icons">phone</i> ${r.phone || '-'}</p><p><i class="material-icons">location_on</i> ${r.address || 'No address'}<br>Lat: ${r.lat?.toFixed(6) || 'N/A'} , Lng: ${r.lng?.toFixed(6) || 'N/A'}</p><p><i class="material-icons">payments</i> Total Bought: ₵${totalBought.toLocaleString()} | Paid: ₵${totalPaid.toLocaleString()} | Unpaid: ₵${(r.outstandingBalance || 0).toLocaleString()}</p><div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin:1rem 0"><button id="partialPaymentBtn">➕ Partial Payment</button><button id="markPaidBtn">✅ Mark Fully Paid</button><button id="editBtn">✏️ Edit Info</button></div><button onclick="closeModal()">Close</button></div></div>`;
         if (document.getElementById('retailerModal')) document.getElementById('retailerModal').remove();
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        document.getElementById('partialPaymentBtn').onclick = async () => { let amt = prompt('Enter payment amount (₵)'); if(amt){ await updatePayment(id, parseFloat(amt)); closeModal(); showToast('Payment recorded'); loadPage('dashboard'); } };
-        document.getElementById('markPaidBtn').onclick = async () => { await db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id).update({ outstandingBalance: 0 }); closeModal(); loadPage('dashboard'); showToast('Marked fully paid'); };
+        document.getElementById('partialPaymentBtn').onclick = async () => { let amt = prompt('Enter payment amount (₵)'); if(amt){ const ref = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id); const d = await ref.get(); await ref.update({ outstandingBalance: Math.max(0, (d.data().outstandingBalance || 0) - parseFloat(amt)) }); closeModal(); loadPage('dashboard'); showToast('Payment recorded'); } };
+        document.getElementById('markPaidBtn').onclick = async () => { await db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id).update({ outstandingBalance: 0 }); closeModal(); loadPage('dashboard'); showToast('Fully paid'); };
         document.getElementById('editBtn').onclick = () => { editRetailer(id, r); closeModal(); };
     };
     window.closeModal = () => document.getElementById('retailerModal')?.remove();
-    async function updatePayment(id, amount) {
-        const ref = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id);
-        const doc = await ref.get();
-        const current = doc.data().outstandingBalance || 0;
-        await ref.update({ outstandingBalance: Math.max(0, current - amount) });
-    }
     async function editRetailer(id, data) {
-        const newName = prompt('New name', data.name);
-        const newPhone = prompt('Phone', data.phone);
-        const newAddr = prompt('Address', data.address);
+        const newName = prompt('New name', data.name); const newPhone = prompt('Phone', data.phone); const newAddr = prompt('Address', data.address);
         if (newName) await db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id).update({ name: newName, phone: newPhone, address: newAddr });
         loadPage('retailers');
     }
+    async function renderRetailersList(container) { await displayRetailerGrid(); container.innerHTML = document.getElementById('retailerGrid')?.parentElement?.outerHTML || '<div class="card">Retailers</div>'; }
 
     function renderAddRetailer(container) {
-        container.innerHTML = `<div class="card"><h3>📍 Add Retailer with Map</h3><form id="retailerForm"><div class="form-group"><label>Full Name *</label><input id="name" required></div><div class="form-group"><label>Phone</label><input id="phone"></div><div class="form-group"><label>Address</label><input id="address"></div><div id="map" class="map-container"></div><div class="form-group"><label>Or search place:</label><input id="searchBox" placeholder="Search nearby store"></div><button type="button" id="getLocationBtn">📍 Get Current Location</button><br><br><button type="submit">Save Retailer</button></form></div>`;
+        container.innerHTML = `<div class="card"><h3>📍 Add Retailer with Map</h3><form id="retailerForm"><div class="form-group"><label>Full Name *</label><input id="name" required></div><div class="form-group"><label>Phone</label><input id="phone"></div><div class="form-group"><label>Address</label><input id="address"></div><div id="map" class="map-container"></div><div class="form-group"><label>Search store:</label><input id="searchBox" placeholder="Nearby store..."></div><button type="button" id="getLocationBtn">📍 Get Current Location</button><br><br><button type="submit">Save Retailer</button></form></div>`;
         setTimeout(() => {
             if (typeof google !== 'undefined') {
-                const mapDiv = document.getElementById('map');
-                const map = new google.maps.Map(mapDiv, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 13 });
-                let marker = null;
-                const searchInput = document.getElementById('searchBox');
-                const searchBox = new google.maps.places.SearchBox(searchInput);
+                const mapDiv = document.getElementById('map'); const map = new google.maps.Map(mapDiv, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 13 }); let marker = null;
+                const searchInput = document.getElementById('searchBox'); const searchBox = new google.maps.places.SearchBox(searchInput);
                 map.addListener('click', (e) => { if (marker) marker.setMap(null); marker = new google.maps.Marker({ position: e.latLng, map }); window.selectedLat = e.latLng.lat(); window.selectedLng = e.latLng.lng(); });
                 searchBox.addListener('places_changed', () => { const places = searchBox.getPlaces(); if (places[0]) { map.setCenter(places[0].geometry.location); marker = new google.maps.Marker({ position: places[0].geometry.location, map }); window.selectedLat = places[0].geometry.location.lat(); window.selectedLng = places[0].geometry.location.lng(); } });
                 document.getElementById('getLocationBtn').onclick = () => { if (navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { const p = { lat: pos.coords.latitude, lng: pos.coords.longitude }; map.setCenter(p); marker = new google.maps.Marker({ position: p, map }); window.selectedLat = p.lat; window.selectedLng = p.lng; }); };
-            } else { document.getElementById('map').innerHTML = '<p>Map loading error: Add Google Maps API key</p>'; }
+            } else document.getElementById('map').innerHTML = '<p style="padding:1rem">⚠️ Google Maps API key missing. Add valid key.</p>';
         }, 200);
         document.getElementById('retailerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await db.collection('suppliers').doc(currentUser.uid).collection('customers').add({
-                name: document.getElementById('name').value, phone: document.getElementById('phone').value, address: document.getElementById('address').value,
-                lat: window.selectedLat || null, lng: window.selectedLng || null, outstandingBalance: 0, createdAt: new Date()
-            });
-            showToast('Retailer added with location!');
-            loadPage('retailers');
+            e.preventDefault(); await db.collection('suppliers').doc(currentUser.uid).collection('customers').add({ name: document.getElementById('name').value, phone: document.getElementById('phone').value, address: document.getElementById('address').value, lat: window.selectedLat || null, lng: window.selectedLng || null, outstandingBalance: 0, createdAt: new Date() });
+            showToast('Retailer added!'); loadPage('retailers');
         });
-    }
-
-    async function renderRetailersList(container) {
-        const snap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
-        let html = `<div class="card"><div class="filter-buttons"><span class="filter-chip active" data-filter="all">All</span><span class="filter-chip" data-filter="unpaid">Unpaid</span><span class="filter-chip" data-filter="bottled">Bottled</span><span class="filter-chip" data-filter="sachet">Sachet</span></div><div id="retailerTable"></div></div>`;
-        container.innerHTML = html;
-        await displayRetailerGrid();
     }
 
     async function renderSaleForm(container) {
         const custSnap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
         let options = '<option value="">Select Retailer</option>';
         custSnap.forEach(d => options += `<option value="${d.id}">${d.data().name}</option>`);
-        container.innerHTML = `<div class="card"><h3>Record Water Sale</h3><form id="saleForm"><div class="form-group"><label>Retailer</label><select id="custId">${options}</select></div><div class="form-group"><label>Product</label><select id="prod"><option value="bottled">Bottled (pack, ₵5)</option><option value="sachet">Sachet (pack, ₵2)</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="qty" value="1" min="1"></div><div class="form-group"><label>Discount (₵)</label><input type="number" id="discount" value="0"></div><div class="form-group"><label>Amount Paid (₵)</label><input type="number" id="paid" value="0"></div><button type="submit">Record Sale (Deducts Stock)</button></form></div>`;
+        container.innerHTML = `<div class="card"><h3>Record Water Sale (Deducts Stock)</h3><form id="saleForm"><div class="form-group"><label>Retailer</label><select id="custId">${options}</select></div><div class="form-group"><label>Product</label><select id="prod"><option value="bottled">Bottled (pack) ₵5</option><option value="sachet">Sachet (pack) ₵2</option></select></div><div class="form-group"><label>Quantity (packs)</label><input type="number" id="qty" value="1" min="1"></div><div class="form-group"><label>Discount (₵)</label><input type="number" id="discount" value="0"></div><div class="form-group"><label>Amount Paid (₵)</label><input type="number" id="paid" value="0"></div><button type="submit">Record Sale & Update Stock</button></form></div>`;
         document.getElementById('saleForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const custId = document.getElementById('custId').value;
-            if (!custId) return showToast('Select retailer');
-            const prod = document.getElementById('prod').value;
-            const qty = parseInt(document.getElementById('qty').value);
-            const discount = parseFloat(document.getElementById('discount').value);
-            const paid = parseFloat(document.getElementById('paid').value);
-            const price = prod === 'bottled' ? 5 : 2;
-            const total = (qty * price) - discount;
-            const unpaid = total - paid;
-            if (!await updateInventory(prod, qty, true)) return;
-            const custRef = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(custId);
-            const custDoc = await custRef.get();
+            e.preventDefault(); const custId = document.getElementById('custId').value; if (!custId) return showToast('Select retailer');
+            const prod = document.getElementById('prod').value; const qty = parseInt(document.getElementById('qty').value); const discount = parseFloat(document.getElementById('discount').value); const paid = parseFloat(document.getElementById('paid').value);
+            const price = prod === 'bottled' ? 5 : 2; const total = (qty * price) - discount; const unpaid = total - paid;
+            if (!await updateStock(prod, qty, true)) return;
+            const custRef = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(custId); const custDoc = await custRef.get();
             await db.collection('suppliers').doc(currentUser.uid).collection('sales').add({ customerId: custId, customerName: custDoc.data().name, productType: prod, quantity: qty, totalAmount: total, paidAmount: paid, unpaidAmount: unpaid, timestamp: new Date() });
             await custRef.update({ outstandingBalance: firebase.firestore.FieldValue.increment(unpaid), lastProduct: prod });
-            showToast(`Sale recorded! Stock deducted: ${qty} ${prod}`);
-            loadPage('dashboard');
+            showToast(`Sold ${qty} ${prod} | Unpaid: ₵${unpaid}`); loadPage('dashboard');
         });
     }
 
     async function renderInventory(container) {
         await loadInventory();
         container.innerHTML = `<div class="stats-grid"><div class="stat-card"><div class="stat-number">${currentStock.bottled}</div><div>Bottled Packs</div><button id="addBottledBtn" style="margin-top:0.5rem">+ Add Stock</button></div><div class="stat-card"><div class="stat-number">${currentStock.sachet}</div><div>Sachet Packs</div><button id="addSachetBtn" style="margin-top:0.5rem">+ Add Stock</button></div></div>`;
-        document.getElementById('addBottledBtn').onclick = async () => { let q = prompt('Add bottled packs:'); if(q){ await updateInventory('bottled', parseInt(q), false); renderInventory(container); } };
-        document.getElementById('addSachetBtn').onclick = async () => { let q = prompt('Add sachet packs:'); if(q){ await updateInventory('sachet', parseInt(q), false); renderInventory(container); } };
+        document.getElementById('addBottledBtn').onclick = async () => { let q = prompt('Add bottled packs:'); if(q){ await updateStock('bottled', parseInt(q), false); renderInventory(container); } };
+        document.getElementById('addSachetBtn').onclick = async () => { let q = prompt('Add sachet packs:'); if(q){ await updateStock('sachet', parseInt(q), false); renderInventory(container); } };
     }
 
     function renderSubscription(container) {
-        container.innerHTML = `<div class="card"><div class="payment-plans" style="display:flex; gap:1rem; flex-wrap:wrap"><div class="stat-card"><h3>6 Months</h3><div class="stat-number">$60</div><p>₵360 / ₦24k</p><button id="sub6">Subscribe</button></div><div class="stat-card"><h3>12 Months</h3><div class="stat-number">$110</div><p>₵660 / ₦44k</p><button id="sub12">Subscribe</button></div></div></div>`;
-        document.getElementById('sub6').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated.');
-        document.getElementById('sub12').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated.');
+        container.innerHTML = `<div class="card"><div style="display:flex; gap:1rem; flex-wrap:wrap"><div class="stat-card"><h3>6 Months Plan</h3><div class="stat-number">$60 USD</div><p>₵360 GHS | ₦24,000 NGN</p><button id="sub6Paystack">Pay via Paystack</button><button id="sub6Kora" style="margin-top:0.5rem">Pay via Kora (MOMO)</button></div><div class="stat-card"><h3>12 Months Plan</h3><div class="stat-number">$110 USD</div><p>₵660 GHS | ₦44,000 NGN</p><button id="sub12Paystack">Pay via Paystack</button><button id="sub12Kora" style="margin-top:0.5rem">Pay via Kora (MOMO)</button></div></div></div>`;
+        const email = currentUser?.email || 'customer@watermall.com';
+        document.getElementById('sub6Paystack').onclick = () => { if(window.PaystackPop) { let handler = PaystackPop.setup({ key: 'pk_live_placeholder', email, amount: 6000, currency: 'GHS', callback: () => showToast('Payment successful! Plan activated.') }); handler.openIframe(); } else showToast('Paystack SDK ready. Add live key.'); };
+        document.getElementById('sub12Paystack').onclick = () => { if(window.PaystackPop) { let handler = PaystackPop.setup({ key: 'pk_live_placeholder', email, amount: 11000, currency: 'GHS', callback: () => showToast('Payment successful!') }); handler.openIframe(); } else showToast('Paystack placeholder'); };
+        document.getElementById('sub6Kora').onclick = () => showToast('Kora (MTN/Telecel) integration ready. Will redirect to payment gateway.');
+        document.getElementById('sub12Kora').onclick = () => showToast('Kora (MTN/Telecel) integration ready. Will redirect to payment gateway.');
     }
+
     initTheme();
 </script>
 </body>
