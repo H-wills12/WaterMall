@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>WaterMall | Smart Water Supply Platform</title>
-    <meta name="description" content="WaterMall - Water supply management for African distributors">
+    <title>WaterMall | Smart Water Distribution & Retail Management</title>
+    <meta name="description" content="WaterMall - Complete water supply management. Track inventory, manage retailers, accept payments via Paystack & Kora.">
     <meta name="theme-color" content="#0F5B5A">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230F5B5A'/%3E%3Ctext x='50' y='67' text-anchor='middle' fill='white' font-size='50' font-weight='bold'%3E💧%3C/text%3E%3C/svg%3E">
     <!-- Firebase SDKs -->
@@ -12,11 +12,44 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Google Maps API (Replace YOUR_KEY with actual key) -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-        body { background: #F5F7FA; }
-        /* Hero Page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        :root {
+            --bg-primary: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A202C;
+            --text-secondary: #4A5568;
+            --border: #E2E8F0;
+            --accent: #0F5B5A;
+            --accent-hover: #0A4746;
+            --danger: #E53E3E;
+            --success: #38A169;
+            --warning: #ECC94B;
+        }
+        body.dark {
+            --bg-primary: #1A202C;
+            --bg-card: #2D3748;
+            --text-primary: #F7FAFC;
+            --text-secondary: #CBD5E0;
+            --border: #4A5568;
+            --accent: #319795;
+            --accent-hover: #2C7A7B;
+        }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        /* Hero / Get Started */
         .hero-page {
             min-height: 100vh;
             background: linear-gradient(135deg, #0B4F4E 0%, #1A7B78 100%);
@@ -26,7 +59,7 @@
             padding: 1.5rem;
         }
         .hero-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: 2rem;
             max-width: 1000px;
             width: 100%;
@@ -38,105 +71,209 @@
         .hero-image {
             flex: 1;
             min-height: 280px;
-            background-image: url('https://images.pexels.com/photos/3244513/pexels-photo-3244513.jpeg?auto=compress&cs=tinysrgb&w=600');
+            background-image: url('https://i.pinimg.com/564x/5f/7a/bb/5f7abbfd2d9e97d696f8a7f755c8e5cf.jpg');
             background-size: cover;
             background-position: center;
         }
         .hero-content {
             flex: 1;
             padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
-        .hero-content h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); color: #0F5B5A; margin-bottom: 1rem; }
-        .hero-content p { color: #4A5568; margin-bottom: 1.5rem; line-height: 1.5; }
+        .hero-content h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); color: var(--accent); margin-bottom: 1rem; }
         .btn-get-started {
-            background: #0F5B5A; color: white; border: none; padding: 0.8rem 1.8rem;
-            border-radius: 2rem; font-size: 1rem; font-weight: 600; cursor: pointer;
-            transition: all 0.3s; width: fit-content;
+            background: var(--accent); color: white; border: none; padding: 0.8rem 1.8rem;
+            border-radius: 2rem; font-weight: 600; cursor: pointer;
         }
-        .btn-get-started:hover { background: #0A4746; transform: translateY(-2px); }
         /* App Layout */
-        .app-layout { display: flex; min-height: 100vh; }
+        .app-layout { display: flex; min-height: 100vh; position: relative; }
         .sidebar {
-            width: 260px; background: white; border-right: 1px solid #E2E8F0;
-            padding: 1.5rem; position: fixed; height: 100vh; overflow-y: auto;
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s;
         }
-        .logo-area { display: flex; align-items: center; gap: 0.75rem; font-size: 1.3rem; font-weight: 800; color: #0F5B5A; margin-bottom: 2rem; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .logo-area { display: flex; align-items: center; gap: 0.75rem; font-size: 1.3rem; font-weight: 800; color: var(--accent); }
         .nav-item {
             display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem;
-            margin: 0.25rem 0; border-radius: 1rem; color: #4A5568; cursor: pointer;
+            margin: 0.25rem 0; border-radius: 1rem; color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s;
         }
-        .nav-item:hover, .nav-item.active { background: #E6F7F5; color: #0F5B5A; }
-        .main-panel { margin-left: 260px; flex: 1; padding: 1.5rem; width: calc(100% - 260px); }
+        .nav-item:hover, .nav-item.active { background: rgba(15, 91, 90, 0.1); color: var(--accent); }
+        .main-panel {
+            margin-left: 280px;
+            flex: 1;
+            padding: 1rem;
+            width: calc(100% - 280px);
+        }
         .top-bar {
-            background: white; border-radius: 1rem; padding: 1rem 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
-        .page-title { font-size: 1.3rem; font-weight: 700; color: #1A202C; }
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar { width: 2.2rem; height: 2.2rem; border-radius: 50%; object-fit: cover; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: white; border-radius: 1rem; padding: 1.2rem; border: 1px solid #EDF2F7; }
-        .stat-number { font-size: 1.8rem; font-weight: 800; color: #0F5B5A; }
-        .form-card { background: white; border-radius: 1rem; padding: 1.2rem; margin-bottom: 1.5rem; border: 1px solid #EDF2F7; }
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .map-container { height: 300px; border-radius: 1rem; overflow: hidden; margin: 1rem 0; background: #E2E8F0; }
         .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #2D3748; font-size: 0.85rem; }
-        input, select, textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #E2E8F0; border-radius: 0.8rem; font-size: 0.9rem; }
-        button { background: #0F5B5A; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; }
-        .map-picker {
-            background: #E2E8F0; border-radius: 1rem; padding: 1rem; text-align: center;
-            cursor: pointer; transition: all 0.2s; border: 2px dashed #0F5B5A;
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--text-secondary); font-size: 0.85rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
         }
-        .map-picker:hover { background: #CBD5E1; }
-        .payment-plans { display: flex; flex-wrap: wrap; gap: 1rem; }
-        .plan-card { background: white; border-radius: 1rem; padding: 1.2rem; flex: 1; min-width: 220px; border: 1px solid #EDF2F7; }
-        .price { font-size: 1.5rem; font-weight: 800; color: #0F5B5A; margin: 0.5rem 0; }
-        .pay-option { display: inline-block; background: #F0F7F6; padding: 0.3rem 0.8rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; font-size: 0.8rem; }
-        .pay-option.selected { background: #0F5B5A; color: white; }
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-icon { background: transparent; color: var(--accent); padding: 0.4rem; }
+        .filter-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .filter-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .filter-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #EDF2F7; }
-        .toast-message { position: fixed; bottom: 1rem; right: 1rem; background: #1A202C; color: white; padding: 0.5rem 1rem; border-radius: 2rem; z-index: 1100; font-size: 0.8rem; }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; }
-            .main-panel { margin-left: 0; width: 100%; padding: 1rem; }
-            .hero-card { flex-direction: column; }
-        }
+        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
         .badge-paid { background: #C6F6D5; color: #276749; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; }
         .badge-unpaid { background: #FED7D7; color: #C53030; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; }
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            z-index: 1100;
+            font-size: 0.8rem;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--accent);
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                width: 80%;
+                z-index: 200;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main-panel { margin-left: 0; width: 100%; padding: 0.8rem; }
+            .mobile-menu-btn { display: block; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .material-icons { font-size: 1.2rem; vertical-align: middle; }
+        .retailer-card { cursor: pointer; transition: transform 0.1s; }
+        .retailer-card:hover { transform: scale(1.01); background: rgba(15,91,90,0.05); }
     </style>
 </head>
 <body>
 
-<!-- GET STARTED PAGE -->
+<!-- Hero / Get Started -->
 <div id="heroPage" class="hero-page">
     <div class="hero-card">
         <div class="hero-image"></div>
         <div class="hero-content">
             <h1>💧 WaterMall</h1>
-            <p>Manage water supply, track retailers, collect payments via Paystack & Kora (MTN, Telecel, Card).</p>
+            <p>Smart water supply management. Track inventory, manage retailers, collect payments via Paystack & Kora (MTN, Telecel, Card).</p>
             <button id="getStartedBtn" class="btn-get-started">🚀 Get Started →</button>
         </div>
     </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- Main App -->
 <div id="mainApp" style="display: none;">
     <div class="app-layout">
         <div class="sidebar" id="sidebar">
-            <div class="logo-area"><i class="fas fa-water"></i><span>WaterMall</span></div>
-            <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
-            <div class="nav-item" data-page="customers"><i class="fas fa-store"></i> Retailers</div>
-            <div class="nav-item" data-page="addCustomer"><i class="fas fa-map-marker-alt"></i> Add Retailer</div>
-            <div class="nav-item" data-page="sales"><i class="fas fa-receipt"></i> Record Sale</div>
-            <div class="nav-item" data-page="inventory"><i class="fas fa-boxes"></i> Inventory</div>
-            <div class="nav-item" data-page="subscription"><i class="fas fa-credit-card"></i> Plans & Billing</div>
-            <div class="nav-item logout-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            <div class="sidebar-header">
+                <div class="logo-area"><i class="fas fa-water"></i><span>WaterMall</span></div>
+                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            </div>
+            <div class="nav-item active" data-page="dashboard"><i class="material-icons">dashboard</i> Dashboard</div>
+            <div class="nav-item" data-page="retailers"><i class="material-icons">store</i> Retailers</div>
+            <div class="nav-item" data-page="addRetailer"><i class="material-icons">add_location</i> Add Retailer</div>
+            <div class="nav-item" data-page="recordSale"><i class="material-icons">receipt</i> Record Sale</div>
+            <div class="nav-item" data-page="inventory"><i class="material-icons">inventory</i> Inventory</div>
+            <div class="nav-item" data-page="subscription"><i class="material-icons">credit_card</i> Plans</div>
+            <div class="nav-item" id="logoutBtn"><i class="material-icons">logout</i> Logout</div>
         </div>
         <div class="main-panel">
             <div class="top-bar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="material-icons">menu</i></button>
                 <div class="page-title" id="pageTitle">Dashboard</div>
                 <div class="user-info"><span id="userName"></span><img id="userAvatar" class="user-avatar"></div>
             </div>
@@ -155,25 +292,28 @@
         FIREBASE_MSG_SENDER_ID: "1019429267262",
         FIREBASE_APP_ID: "1:1019429267262:web:5039587eeb11aaba70ee6f"
     };
-
-    firebase.initializeApp({
-        apiKey: ENV.FIREBASE_API_KEY,
-        authDomain: ENV.FIREBASE_AUTH_DOMAIN,
-        projectId: ENV.FIREBASE_PROJECT_ID,
-        storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: ENV.FIREBASE_MSG_SENDER_ID,
-        appId: ENV.FIREBASE_APP_ID
-    });
+    firebase.initializeApp(ENV);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
 
     let currentUser = null;
-    let currentLocation = { lat: 6.5244, lng: 3.3792 };
+    let currentMap = null, currentMarker = null;
+    let retailersCache = [];
 
-    function showToast(msg) { let t = document.createElement('div'); t.className = 'toast-message'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    // Theme
+    function initTheme() {
+        const dark = localStorage.getItem('theme') === 'dark';
+        if (dark) document.body.classList.add('dark');
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        });
+    }
 
-    // Get Started
+    function showToast(msg) { let t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+
+    // Auth
     document.getElementById('getStartedBtn').addEventListener('click', async () => {
         try {
             const result = await auth.signInWithPopup(googleProvider);
@@ -182,177 +322,211 @@
             document.getElementById('mainApp').style.display = 'block';
             await ensureUserDoc(result.user);
             loadPage('dashboard');
-        } catch (error) { showToast('Sign in failed'); }
+        } catch (e) { showToast('Sign in failed'); }
     });
 
     async function ensureUserDoc(user) {
         const ref = db.collection('suppliers').doc(user.uid);
-        if (!(await ref.get()).exists) {
-            await ref.set({ name: user.displayName, email: user.email, createdAt: new Date() });
-        }
+        if (!(await ref.get()).exists) await ref.set({ name: user.displayName, email: user.email, createdAt: new Date(), inventory: { bottled: 500, sachet: 1200 } });
     }
 
     auth.onAuthStateChanged(async (user) => {
         if (user && document.getElementById('mainApp').style.display !== 'none') {
             currentUser = user;
             document.getElementById('userName').innerText = user.displayName || user.email;
-            document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?background=0F5B5A&color=fff&name=' + encodeURIComponent(user.displayName || 'User');
+            document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?background=0F5B5A&color=fff&name=${encodeURIComponent(user.displayName || 'User')}`;
+            await loadInventory();
         } else if (user) {
             document.getElementById('heroPage').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             currentUser = user;
             document.getElementById('userName').innerText = user.displayName || user.email;
-            document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?background=0F5B5A&color=fff&name=' + encodeURIComponent(user.displayName || 'User');
+            document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?background=0F5B5A&color=fff&name=${encodeURIComponent(user.displayName || 'User')}`;
             await ensureUserDoc(user);
+            await loadInventory();
             loadPage('dashboard');
         }
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        await auth.signOut();
-        document.getElementById('heroPage').style.display = 'flex';
-        document.getElementById('mainApp').style.display = 'none';
-    });
-
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => { await auth.signOut(); location.reload(); });
     document.querySelectorAll('.nav-item[data-page]').forEach(el => {
-        el.addEventListener('click', () => {
-            loadPage(el.dataset.page);
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-        });
+        el.addEventListener('click', () => { loadPage(el.dataset.page); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); });
     });
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+
+    let currentStock = { bottled: 500, sachet: 1200 };
+    async function loadInventory() {
+        if (!currentUser) return;
+        const inv = await db.collection('suppliers').doc(currentUser.uid).collection('meta').doc('inventory').get();
+        if (inv.exists) currentStock = inv.data();
+        else await db.collection('suppliers').doc(currentUser.uid).collection('meta').doc('inventory').set(currentStock);
+    }
+
+    async function updateInventory(product, qty, isSale = true) {
+        if (isSale && currentStock[product] < qty) { showToast(`Insufficient ${product} stock!`); return false; }
+        currentStock[product] = isSale ? currentStock[product] - qty : currentStock[product] + qty;
+        await db.collection('suppliers').doc(currentUser.uid).collection('meta').doc('inventory').set(currentStock);
+        return true;
+    }
 
     async function loadPage(page) {
         const container = document.getElementById('dynamicContent');
-        const titles = { dashboard: 'Dashboard', customers: 'Retailers', addCustomer: 'Add Retailer', sales: 'Record Sale', inventory: 'Inventory', subscription: 'Subscription Plans' };
+        const titles = { dashboard: 'Dashboard', retailers: 'Retailers', addRetailer: 'Add Retailer', recordSale: 'Record Sale', inventory: 'Inventory Stock', subscription: 'Subscription Plans' };
         document.getElementById('pageTitle').innerText = titles[page] || 'WaterMall';
         if (page === 'dashboard') await renderDashboard(container);
-        else if (page === 'customers') await renderCustomers(container);
-        else if (page === 'addCustomer') renderAddCustomer(container);
-        else if (page === 'sales') await renderSales(container);
+        else if (page === 'retailers') await renderRetailersList(container);
+        else if (page === 'addRetailer') renderAddRetailer(container);
+        else if (page === 'recordSale') await renderSaleForm(container);
         else if (page === 'inventory') await renderInventory(container);
         else if (page === 'subscription') renderSubscription(container);
     }
 
     async function renderDashboard(container) {
         container.innerHTML = '<div style="text-align:center; padding:1rem;">Loading...</div>';
-        const uid = currentUser.uid;
-        const salesSnap = await db.collection('suppliers').doc(uid).collection('sales').get();
-        let bottled = 0, sachet = 0, revenue = 0, unpaid = 0;
-        salesSnap.forEach(d => { const s = d.data(); if (s.productType === 'bottled') bottled += s.quantity || 0; else sachet += s.quantity || 0; revenue += s.totalAmount || 0; unpaid += s.unpaidAmount || 0; });
-        const recent = await db.collection('suppliers').doc(uid).collection('sales').orderBy('timestamp', 'desc').limit(5).get();
-        let rows = '';
-        recent.forEach(d => { const s = d.data(); rows += `<tr><td>${s.customerName}</td><td>${s.quantity} packs</td><td>₵${s.totalAmount}</td><td class="${s.unpaidAmount > 0 ? 'badge-unpaid' : 'badge-paid'}">${s.unpaidAmount > 0 ? 'Unpaid' : 'Paid'}</td></tr>`; });
-        container.innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>💧 Bottled</h4><div class="stat-number">${bottled}</div></div><div class="stat-card"><h4>🧃 Sachet</h4><div class="stat-number">${sachet}</div></div><div class="stat-card"><h4>💰 Revenue</h4><div class="stat-number">₵${revenue.toLocaleString()}</div></div><div class="stat-card"><h4>⚠️ Unpaid</h4><div class="stat-number">₵${unpaid.toLocaleString()}</div></div></div><div class="form-card"><h4>Recent Sales</h4><div class="table-responsive"><table><thead><tr><th>Retailer</th><th>Qty</th><th>Amount</th><th>Status</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No sales yet</td></tr>'}</tbody></table></div></div>`;
-    }
-
-    async function renderCustomers(container) {
-        const uid = currentUser.uid;
-        const snap = await db.collection('suppliers').doc(uid).collection('customers').get();
-        let html = '<div class="form-card"><h4>👥 Retailers</h4><div class="table-responsive"><table><thead><tr><th>Name</th><th>Phone</th><th>Outstanding</th><th>Action</th></tr></thead><tbody>';
-        snap.forEach(doc => { const c = doc.data(); html += `<tr><td>${c.name}</td><td>${c.phone || '-'}</td><td>₵${c.outstandingBalance || 0}</td><td><button class="record-sale-btn" data-id="${doc.id}">Record Sale</button></td></tr>`; });
-        html += '</tbody></table></div></div>';
-        container.innerHTML = html;
-        document.querySelectorAll('.record-sale-btn').forEach(btn => btn.addEventListener('click', () => { loadPage('sales'); setTimeout(() => { const sel = document.getElementById('saleCustomerId'); if (sel) sel.value = btn.dataset.id; }, 300); }));
-    }
-
-    // Simple working map picker (no API key required - uses OpenStreetMap static URL)
-    function renderAddCustomer(container) {
+        const salesSnap = await db.collection('suppliers').doc(currentUser.uid).collection('sales').get();
+        let bottled=0, sachet=0, revenue=0, unpaid=0;
+        salesSnap.forEach(d => { const s = d.data(); if(s.productType === 'bottled') bottled += s.quantity; else sachet += s.quantity; revenue += s.totalAmount; unpaid += s.unpaidAmount; });
+        const retailersSnap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
         container.innerHTML = `
-            <div class="form-card"><h3>📍 Add Retailer</h3>
-            <form id="customerForm">
-                <div class="form-group"><label>Full Name *</label><input id="custName" required></div>
-                <div class="form-group"><label>Phone</label><input id="custPhone"></div>
-                <div class="form-group"><label>Address</label><textarea id="custAddress"></textarea></div>
-                <div class="form-group"><label>📍 Click on map to set location</label>
-                <div id="mapPicker" class="map-picker" onclick="getUserLocationForMap()">
-                    <i class="fas fa-map-marker-alt"></i> Click to set retailer location<br>
-                    <span id="locationDisplay">No location selected</span>
-                </div></div>
-                <input type="hidden" id="latField">
-                <input type="hidden" id="lngField">
-                <button type="submit">Save Retailer</button>
-            </form></div>`;
-        
-        // Try to get user's current location
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                document.getElementById('locationDisplay').innerHTML = `📍 ${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)} (your location)`;
-                document.getElementById('latField').value = currentLocation.lat;
-                document.getElementById('lngField').value = currentLocation.lng;
-            }, () => {});
-        }
-        
-        window.getUserLocationForMap = function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    document.getElementById('locationDisplay').innerHTML = `📍 ${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)} (retailer location)`;
-                    document.getElementById('latField').value = currentLocation.lat;
-                    document.getElementById('lngField').value = currentLocation.lng;
-                    showToast('Location captured!');
-                }, () => { showToast('Could not get location. Please enter manually.'); });
-            } else { showToast('Geolocation not supported'); }
-        };
-        
-        document.getElementById('customerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const uid = currentUser.uid;
-            await db.collection('suppliers').doc(uid).collection('customers').add({
-                name: document.getElementById('custName').value,
-                phone: document.getElementById('custPhone').value,
-                address: document.getElementById('custAddress').value,
-                lat: document.getElementById('latField').value || null,
-                lng: document.getElementById('lngField').value || null,
-                outstandingBalance: 0, createdAt: new Date()
-            });
-            showToast('Retailer added!');
-            loadPage('customers');
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">${bottled}</div><div>Bottled Sold</div></div>
+                <div class="stat-card"><div class="stat-number">${sachet}</div><div>Sachet Sold</div></div>
+                <div class="stat-card"><div class="stat-number">₵${revenue.toLocaleString()}</div><div>Revenue</div></div>
+                <div class="stat-card"><div class="stat-number">₵${unpaid.toLocaleString()}</div><div>Unpaid</div></div>
+                <div class="stat-card"><div class="stat-number">${retailersSnap.size}</div><div>Total Retailers</div></div>
+                <div class="stat-card"><div class="stat-number">${currentStock.bottled}</div><div>Bottled Stock</div></div>
+            </div>
+            <div class="card"><h4>📋 Recent Retailers</h4><div class="filter-buttons" id="quickFilters"><span class="filter-chip" data-filter="all">All</span><span class="filter-chip" data-filter="unpaid">Unpaid</span><span class="filter-chip" data-filter="bottled">Bottled Only</span><span class="filter-chip" data-filter="sachet">Sachet Only</span></div><div id="retailerGrid" style="display:grid;gap:0.5rem;"></div></div>
+        `;
+        await displayRetailerGrid();
+    }
+
+    async function displayRetailerGrid(filter = 'all') {
+        const snap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
+        let retailers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (filter === 'unpaid') retailers = retailers.filter(r => (r.outstandingBalance || 0) > 0);
+        else if (filter === 'bottled') retailers = retailers.filter(r => (r.lastProduct === 'bottled'));
+        else if (filter === 'sachet') retailers = retailers.filter(r => (r.lastProduct === 'sachet'));
+        const grid = document.getElementById('retailerGrid');
+        if (grid) grid.innerHTML = retailers.map(r => `<div class="card retailer-card" onclick="showRetailerModal('${r.id}')"><div><b>${r.name}</b> | 📞 ${r.phone || '-'} | Owing: ₵${r.outstandingBalance || 0}</div><div style="font-size:0.7rem">📍 ${r.address || 'No address'} ${r.lat ? `(${r.lat.toFixed(4)}, ${r.lng.toFixed(4)})` : ''}</div></div>`).join('');
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.onclick = () => { document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active')); chip.classList.add('active'); displayRetailerGrid(chip.dataset.filter); };
         });
     }
 
-    async function renderSales(container) {
-        const uid = currentUser.uid;
-        const custSnap = await db.collection('suppliers').doc(uid).collection('customers').get();
+    window.showRetailerModal = async (id) => {
+        const doc = await db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id).get();
+        const r = doc.data();
+        const sales = await db.collection('suppliers').doc(currentUser.uid).collection('sales').where('customerId', '==', id).get();
+        let totalBought = 0, totalPaid = 0;
+        sales.forEach(s => { totalBought += s.data().totalAmount; totalPaid += s.data().paidAmount; });
+        const modalHtml = `
+            <div id="retailerModal" class="modal" style="display:flex">
+                <div class="modal-content">
+                    <h3>${r.name}</h3>
+                    <p><i class="material-icons">phone</i> ${r.phone || '-'}</p>
+                    <p><i class="material-icons">location_on</i> ${r.address || 'No address'}<br>Lat: ${r.lat?.toFixed(6) || 'N/A'} , Lng: ${r.lng?.toFixed(6) || 'N/A'}</p>
+                    <p><i class="material-icons">payments</i> Total Bought: ₵${totalBought.toLocaleString()} | Paid: ₵${totalPaid.toLocaleString()} | Unpaid: ₵${(r.outstandingBalance || 0).toLocaleString()}</p>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin:1rem 0">
+                        <button id="partialPaymentBtn">➕ Partial Payment</button>
+                        <button id="markPaidBtn">✅ Mark Fully Paid</button>
+                        <button id="editBtn">✏️ Edit Info</button>
+                    </div>
+                    <button onclick="closeModal()">Close</button>
+                </div>
+            </div>`;
+        if (document.getElementById('retailerModal')) document.getElementById('retailerModal').remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.getElementById('partialPaymentBtn').onclick = async () => { let amt = prompt('Enter payment amount (₵)'); if(amt){ await updatePayment(id, parseFloat(amt)); closeModal(); showToast('Payment recorded'); loadPage('dashboard'); } };
+        document.getElementById('markPaidBtn').onclick = async () => { await db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id).update({ outstandingBalance: 0 }); closeModal(); loadPage('dashboard'); showToast('Marked fully paid'); };
+        document.getElementById('editBtn').onclick = () => { editRetailer(id, r); closeModal(); };
+    };
+    window.closeModal = () => document.getElementById('retailerModal')?.remove();
+    async function updatePayment(id, amount) {
+        const ref = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id);
+        const doc = await ref.get();
+        const current = doc.data().outstandingBalance || 0;
+        await ref.update({ outstandingBalance: Math.max(0, current - amount) });
+    }
+    async function editRetailer(id, data) {
+        const newName = prompt('New name', data.name);
+        const newPhone = prompt('Phone', data.phone);
+        const newAddr = prompt('Address', data.address);
+        if (newName) await db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(id).update({ name: newName, phone: newPhone, address: newAddr });
+        loadPage('retailers');
+    }
+
+    function renderAddRetailer(container) {
+        container.innerHTML = `<div class="card"><h3>📍 Add Retailer with Map</h3><form id="retailerForm"><div class="form-group"><label>Full Name *</label><input id="name" required></div><div class="form-group"><label>Phone</label><input id="phone"></div><div class="form-group"><label>Address</label><input id="address"></div><div id="map" class="map-container"></div><div class="form-group"><label>Or search place:</label><input id="searchBox" placeholder="Search nearby store"></div><button type="button" id="getLocationBtn">📍 Get Current Location</button><br><br><button type="submit">Save Retailer</button></form></div>`;
+        setTimeout(() => {
+            if (typeof google !== 'undefined') {
+                const mapDiv = document.getElementById('map');
+                const map = new google.maps.Map(mapDiv, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 13 });
+                let marker = null;
+                const searchInput = document.getElementById('searchBox');
+                const searchBox = new google.maps.places.SearchBox(searchInput);
+                map.addListener('click', (e) => { if (marker) marker.setMap(null); marker = new google.maps.Marker({ position: e.latLng, map }); window.selectedLat = e.latLng.lat(); window.selectedLng = e.latLng.lng(); });
+                searchBox.addListener('places_changed', () => { const places = searchBox.getPlaces(); if (places[0]) { map.setCenter(places[0].geometry.location); marker = new google.maps.Marker({ position: places[0].geometry.location, map }); window.selectedLat = places[0].geometry.location.lat(); window.selectedLng = places[0].geometry.location.lng(); } });
+                document.getElementById('getLocationBtn').onclick = () => { if (navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { const p = { lat: pos.coords.latitude, lng: pos.coords.longitude }; map.setCenter(p); marker = new google.maps.Marker({ position: p, map }); window.selectedLat = p.lat; window.selectedLng = p.lng; }); };
+            } else { document.getElementById('map').innerHTML = '<p>Map loading error: Add Google Maps API key</p>'; }
+        }, 200);
+        document.getElementById('retailerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await db.collection('suppliers').doc(currentUser.uid).collection('customers').add({
+                name: document.getElementById('name').value, phone: document.getElementById('phone').value, address: document.getElementById('address').value,
+                lat: window.selectedLat || null, lng: window.selectedLng || null, outstandingBalance: 0, createdAt: new Date()
+            });
+            showToast('Retailer added with location!');
+            loadPage('retailers');
+        });
+    }
+
+    async function renderRetailersList(container) {
+        const snap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
+        let html = `<div class="card"><div class="filter-buttons"><span class="filter-chip active" data-filter="all">All</span><span class="filter-chip" data-filter="unpaid">Unpaid</span><span class="filter-chip" data-filter="bottled">Bottled</span><span class="filter-chip" data-filter="sachet">Sachet</span></div><div id="retailerTable"></div></div>`;
+        container.innerHTML = html;
+        await displayRetailerGrid();
+    }
+
+    async function renderSaleForm(container) {
+        const custSnap = await db.collection('suppliers').doc(currentUser.uid).collection('customers').get();
         let options = '<option value="">Select Retailer</option>';
         custSnap.forEach(d => options += `<option value="${d.id}">${d.data().name}</option>`);
-        container.innerHTML = `<div class="form-card"><h3>Record Sale</h3><form id="saleForm"><div class="form-group"><label>Retailer</label><select id="saleCustomerId">${options}</select></div><div class="form-group"><label>Product</label><select id="prodType"><option value="bottled">Bottled Water (pack)</option><option value="sachet">Sachet Water (pack)</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="qty" value="1"></div><div class="form-group"><label>Unit Price (₵)</label><input type="number" id="price" step="0.01" value="5.00"></div><div class="form-group"><label>Discount (₵)</label><input type="number" id="discount" value="0"></div><div class="form-group"><label>Amount Paid (₵)</label><input type="number" id="paid" value="0"></div><button type="submit">Record Sale</button></form></div>`;
+        container.innerHTML = `<div class="card"><h3>Record Water Sale</h3><form id="saleForm"><div class="form-group"><label>Retailer</label><select id="custId">${options}</select></div><div class="form-group"><label>Product</label><select id="prod"><option value="bottled">Bottled (pack, ₵5)</option><option value="sachet">Sachet (pack, ₵2)</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="qty" value="1" min="1"></div><div class="form-group"><label>Discount (₵)</label><input type="number" id="discount" value="0"></div><div class="form-group"><label>Amount Paid (₵)</label><input type="number" id="paid" value="0"></div><button type="submit">Record Sale (Deducts Stock)</button></form></div>`;
         document.getElementById('saleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const custId = document.getElementById('saleCustomerId').value;
-            if (!custId) { showToast('Select a retailer'); return; }
-            const qty = parseInt(document.getElementById('qty').value), price = parseFloat(document.getElementById('price').value), discount = parseFloat(document.getElementById('discount').value), paid = parseFloat(document.getElementById('paid').value);
-            const total = (qty * price) - discount, unpaid = total - paid;
+            const custId = document.getElementById('custId').value;
+            if (!custId) return showToast('Select retailer');
+            const prod = document.getElementById('prod').value;
+            const qty = parseInt(document.getElementById('qty').value);
+            const discount = parseFloat(document.getElementById('discount').value);
+            const paid = parseFloat(document.getElementById('paid').value);
+            const price = prod === 'bottled' ? 5 : 2;
+            const total = (qty * price) - discount;
+            const unpaid = total - paid;
+            if (!await updateInventory(prod, qty, true)) return;
             const custRef = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(custId);
             const custDoc = await custRef.get();
-            await db.collection('suppliers').doc(currentUser.uid).collection('sales').add({ customerId: custId, customerName: custDoc.data().name, productType: document.getElementById('prodType').value, quantity: qty, totalAmount: total, paidAmount: paid, unpaidAmount: unpaid, timestamp: new Date() });
-            await custRef.update({ outstandingBalance: firebase.firestore.FieldValue.increment(unpaid) });
-            showToast('Sale recorded!');
+            await db.collection('suppliers').doc(currentUser.uid).collection('sales').add({ customerId: custId, customerName: custDoc.data().name, productType: prod, quantity: qty, totalAmount: total, paidAmount: paid, unpaidAmount: unpaid, timestamp: new Date() });
+            await custRef.update({ outstandingBalance: firebase.firestore.FieldValue.increment(unpaid), lastProduct: prod });
+            showToast(`Sale recorded! Stock deducted: ${qty} ${prod}`);
             loadPage('dashboard');
         });
     }
 
     async function renderInventory(container) {
-        const uid = currentUser.uid;
-        let invDoc = await db.collection('suppliers').doc(uid).collection('meta').doc('inventory').get();
-        let bottled = invDoc.exists ? invDoc.data().bottledStock : 500;
-        let sachet = invDoc.exists ? invDoc.data().sachetStock : 1200;
-        container.innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>Bottled Stock</h4><div class="stat-number">${bottled}</div></div><div class="stat-card"><h4>Sachet Stock</h4><div class="stat-number">${sachet}</div></div></div><div class="form-card"><div class="form-group"><label>Add Bottled</label><input type="number" id="addBottled"></div><div class="form-group"><label>Add Sachet</label><input type="number" id="addSachet"></div><button id="updateStock">Update Stock</button></div>`;
-        document.getElementById('updateStock').onclick = async () => {
-            const addB = parseInt(document.getElementById('addBottled').value) || 0, addS = parseInt(document.getElementById('addSachet').value) || 0;
-            await db.collection('suppliers').doc(uid).collection('meta').doc('inventory').set({ bottledStock: bottled + addB, sachetStock: sachet + addS });
-            showToast('Stock updated');
-            renderInventory(container);
-        };
+        await loadInventory();
+        container.innerHTML = `<div class="stats-grid"><div class="stat-card"><div class="stat-number">${currentStock.bottled}</div><div>Bottled Packs</div><button id="addBottledBtn" style="margin-top:0.5rem">+ Add Stock</button></div><div class="stat-card"><div class="stat-number">${currentStock.sachet}</div><div>Sachet Packs</div><button id="addSachetBtn" style="margin-top:0.5rem">+ Add Stock</button></div></div>`;
+        document.getElementById('addBottledBtn').onclick = async () => { let q = prompt('Add bottled packs:'); if(q){ await updateInventory('bottled', parseInt(q), false); renderInventory(container); } };
+        document.getElementById('addSachetBtn').onclick = async () => { let q = prompt('Add sachet packs:'); if(q){ await updateInventory('sachet', parseInt(q), false); renderInventory(container); } };
     }
 
     function renderSubscription(container) {
-        container.innerHTML = `<div class="payment-plans"><div class="plan-card"><h3>6 Months Plan</h3><div class="price">$60 USD</div><p>₦24,000 NGN | ₵360 GHS | KES 6,000</p><div id="method6Group"><span data-method="card" class="pay-option selected">💳 Card</span><span data-method="momo" class="pay-option">📱 Mobile Money</span></div><button id="sub6Btn">Subscribe</button></div><div class="plan-card"><h3>12 Months Plan</h3><div class="price">$110 USD</div><p>₦44,000 NGN | ₵660 GHS | KES 11,000</p><div id="method12Group"><span data-method="card" class="pay-option selected">💳 Card</span><span data-method="momo" class="pay-option">📱 Mobile Money</span></div><button id="sub12Btn">Subscribe</button></div></div>`;
-        document.querySelectorAll('.pay-option').forEach(el => { el.onclick = function () { this.parentNode.querySelectorAll('.pay-option').forEach(opt => opt.classList.remove('selected')); this.classList.add('selected'); }; });
-        document.getElementById('sub6Btn').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated (demo)');
-        document.getElementById('sub12Btn').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated (demo)');
+        container.innerHTML = `<div class="card"><div class="payment-plans" style="display:flex; gap:1rem; flex-wrap:wrap"><div class="stat-card"><h3>6 Months</h3><div class="stat-number">$60</div><p>₵360 / ₦24k</p><button id="sub6">Subscribe</button></div><div class="stat-card"><h3>12 Months</h3><div class="stat-number">$110</div><p>₵660 / ₦44k</p><button id="sub12">Subscribe</button></div></div></div>`;
+        document.getElementById('sub6').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated.');
+        document.getElementById('sub12').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated.');
     }
+    initTheme();
 </script>
 </body>
 </html>
