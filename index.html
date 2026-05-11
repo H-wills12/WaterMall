@@ -3,39 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>WaterMall | Smart Water Supply & Distribution Platform</title>
-    <meta name="description" content="WaterMall - The ultimate water supply management platform for African distributors. Track inventory, manage retailers, collect payments via Paystack & Kora.">
-    <meta name="keywords" content="water supply, distribution, retailer management, water delivery, paystack, kora, momo, MTN, Telecel, water business, inventory tracking, Africa">
-    <meta name="author" content="WaterMall">
+    <title>WaterMall | Smart Water Supply Platform</title>
+    <meta name="description" content="WaterMall - Water supply management for African distributors">
     <meta name="theme-color" content="#0F5B5A">
-    <meta property="og:title" content="WaterMall - Water Distribution & Retail Management">
-    <meta property="og:description" content="Manage your water supply chain, collect payments via mobile money & cards, real-time analytics.">
-    <meta property="og:image" content="https://watermall.app/og-image.jpg">
-    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230F5B5A'/%3E%3Ctext x='50' y='67' text-anchor='middle' fill='white' font-size='50' font-weight='bold'%3E💧%3C/text%3E%3C/svg%3E">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-        }
-
-        body {
-            background: #F5F7FA;
-            overflow-x: hidden;
-        }
-
-        /* Get Started / Hero Page - Clean & Responsive */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #F5F7FA; }
+        /* Hero Page */
         .hero-page {
             min-height: 100vh;
             background: linear-gradient(135deg, #0B4F4E 0%, #1A7B78 100%);
@@ -44,424 +25,120 @@
             justify-content: center;
             padding: 1.5rem;
         }
-
         .hero-card {
             background: white;
             border-radius: 2rem;
-            max-width: 1200px;
+            max-width: 1000px;
             width: 100%;
             display: flex;
             flex-wrap: wrap;
             overflow: hidden;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
         }
-
         .hero-image {
             flex: 1;
-            min-height: 300px;
+            min-height: 280px;
             background-image: url('https://images.pexels.com/photos/3244513/pexels-photo-3244513.jpeg?auto=compress&cs=tinysrgb&w=600');
             background-size: cover;
             background-position: center;
         }
-
         .hero-content {
             flex: 1;
-            padding: 2.5rem;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-
-        .hero-content h1 {
-            font-size: clamp(2rem, 5vw, 3rem);
-            color: #0F5B5A;
-            margin-bottom: 1rem;
-        }
-
-        .hero-content p {
-            font-size: 1rem;
-            color: #4A5568;
-            margin-bottom: 2rem;
-            line-height: 1.5;
-        }
-
+        .hero-content h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); color: #0F5B5A; margin-bottom: 1rem; }
+        .hero-content p { color: #4A5568; margin-bottom: 1.5rem; line-height: 1.5; }
         .btn-get-started {
-            background: #0F5B5A;
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 3rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: fit-content;
+            background: #0F5B5A; color: white; border: none; padding: 0.8rem 1.8rem;
+            border-radius: 2rem; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; width: fit-content;
         }
-
-        .btn-get-started:hover {
-            background: #0A4746;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(15, 91, 90, 0.3);
-        }
-
-        /* Main App Layout - Fully Responsive */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: row;
-        }
-
-        /* Sidebar */
+        .btn-get-started:hover { background: #0A4746; transform: translateY(-2px); }
+        /* App Layout */
+        .app-layout { display: flex; min-height: 100vh; }
         .sidebar {
-            width: 280px;
-            background: white;
-            border-right: 1px solid #E2E8F0;
-            padding: 1.5rem;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            transition: transform 0.3s;
-            z-index: 100;
+            width: 260px; background: white; border-right: 1px solid #E2E8F0;
+            padding: 1.5rem; position: fixed; height: 100vh; overflow-y: auto;
         }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #0F5B5A;
-            margin-bottom: 2rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #E2E8F0;
-        }
-
+        .logo-area { display: flex; align-items: center; gap: 0.75rem; font-size: 1.3rem; font-weight: 800; color: #0F5B5A; margin-bottom: 2rem; }
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            margin: 0.25rem 0;
-            border-radius: 1rem;
-            color: #4A5568;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem;
+            margin: 0.25rem 0; border-radius: 1rem; color: #4A5568; cursor: pointer;
         }
-
-        .nav-item i {
-            width: 1.5rem;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: #E6F7F5;
-            color: #0F5B5A;
-        }
-
-        .logout-item {
-            margin-top: 2rem;
-            border-top: 1px solid #E2E8F0;
-            padding-top: 1rem;
-        }
-
-        /* Main Content */
-        .main-panel {
-            margin-left: 280px;
-            flex: 1;
-            padding: 1.5rem;
-            width: calc(100% - 280px);
-        }
-
+        .nav-item:hover, .nav-item.active { background: #E6F7F5; color: #0F5B5A; }
+        .main-panel { margin-left: 260px; flex: 1; padding: 1.5rem; width: calc(100% - 260px); }
         .top-bar {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
+            background: white; border-radius: 1rem; padding: 1rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;
         }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1A202C;
+        .page-title { font-size: 1.3rem; font-weight: 700; color: #1A202C; }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar { width: 2.2rem; height: 2.2rem; border-radius: 50%; object-fit: cover; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: white; border-radius: 1rem; padding: 1.2rem; border: 1px solid #EDF2F7; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: #0F5B5A; }
+        .form-card { background: white; border-radius: 1rem; padding: 1.2rem; margin-bottom: 1.5rem; border: 1px solid #EDF2F7; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #2D3748; font-size: 0.85rem; }
+        input, select, textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #E2E8F0; border-radius: 0.8rem; font-size: 0.9rem; }
+        button { background: #0F5B5A; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; }
+        .map-picker {
+            background: #E2E8F0; border-radius: 1rem; padding: 1rem; text-align: center;
+            cursor: pointer; transition: all 0.2s; border: 2px dashed #0F5B5A;
         }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-avatar {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #0F5B5A;
-        }
-
-        /* Cards & Grids */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #EDF2F7;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #0F5B5A;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #EDF2F7;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #2D3748;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #E2E8F0;
-            border-radius: 1rem;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #0F5B5A;
-            box-shadow: 0 0 0 3px rgba(15, 91, 90, 0.1);
-        }
-
-        button {
-            background: #0F5B5A;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            background: #0A4746;
-            transform: translateY(-1px);
-        }
-
-        .map-container {
-            height: 250px;
-            border-radius: 1rem;
-            overflow: hidden;
-            background: #EDF2F7;
-            margin: 1rem 0;
-        }
-
-        .payment-plans {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-        }
-
-        .plan-card {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            flex: 1;
-            min-width: 250px;
-            border: 1px solid #EDF2F7;
-        }
-
-        .price {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #0F5B5A;
-            margin: 1rem 0;
-        }
-
-        .pay-option {
-            display: inline-block;
-            background: #F0F7F6;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            margin: 0.25rem;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .pay-option.selected {
-            background: #0F5B5A;
-            color: white;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #EDF2F7;
-        }
-
-        th {
-            color: #4A5568;
-            font-weight: 600;
-        }
-
-        .toast-message {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background: #1A202C;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
-            z-index: 1100;
-            font-size: 0.875rem;
-        }
-
-        /* Responsive */
+        .map-picker:hover { background: #CBD5E1; }
+        .payment-plans { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .plan-card { background: white; border-radius: 1rem; padding: 1.2rem; flex: 1; min-width: 220px; border: 1px solid #EDF2F7; }
+        .price { font-size: 1.5rem; font-weight: 800; color: #0F5B5A; margin: 0.5rem 0; }
+        .pay-option { display: inline-block; background: #F0F7F6; padding: 0.3rem 0.8rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; font-size: 0.8rem; }
+        .pay-option.selected { background: #0F5B5A; color: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #EDF2F7; }
+        .toast-message { position: fixed; bottom: 1rem; right: 1rem; background: #1A202C; color: white; padding: 0.5rem 1rem; border-radius: 2rem; z-index: 1100; font-size: 0.8rem; }
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 200;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-panel {
-                margin-left: 0;
-                width: 100%;
-                padding: 1rem;
-            }
-            .hero-card {
-                flex-direction: column;
-            }
-            .hero-image {
-                min-height: 200px;
-            }
-            .menu-toggle {
-                display: block;
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 250;
-                background: #0F5B5A;
-                color: white;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-            }
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 200; }
+            .main-panel { margin-left: 0; width: 100%; padding: 1rem; }
+            .hero-card { flex-direction: column; }
         }
-
-        @media (min-width: 769px) {
-            .menu-toggle {
-                display: none;
-            }
-        }
-
-        .badge-paid {
-            background: #C6F6D5;
-            color: #276749;
-            padding: 0.25rem 0.75rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-        }
-
-        .badge-unpaid {
-            background: #FED7D7;
-            color: #C53030;
-            padding: 0.25rem 0.75rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-        }
+        .badge-paid { background: #C6F6D5; color: #276749; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; }
+        .badge-unpaid { background: #FED7D7; color: #C53030; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
-<!-- GET STARTED PAGE (Single Image) -->
+<!-- GET STARTED PAGE -->
 <div id="heroPage" class="hero-page">
     <div class="hero-card">
         <div class="hero-image"></div>
         <div class="hero-content">
             <h1>💧 WaterMall</h1>
-            <p>Smart water supply management for African distributors. Track bottled & sachet water, manage retailers, collect payments via Paystack & Kora (MTN, Telecel, Card).</p>
+            <p>Manage water supply, track retailers, collect payments via Paystack & Kora (MTN, Telecel, Card).</p>
             <button id="getStartedBtn" class="btn-get-started">🚀 Get Started →</button>
         </div>
     </div>
 </div>
 
-<!-- MAIN APP (hidden until login) -->
+<!-- MAIN APP -->
 <div id="mainApp" style="display: none;">
     <div class="app-layout">
         <div class="sidebar" id="sidebar">
-            <div class="logo-area">
-                <i class="fas fa-water"></i>
-                <span>WaterMall</span>
-            </div>
-            <div class="nav-item active" data-page="dashboard">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </div>
-            <div class="nav-item" data-page="customers">
-                <i class="fas fa-store"></i> Retailers
-            </div>
-            <div class="nav-item" data-page="addCustomer">
-                <i class="fas fa-map-marker-alt"></i> Add Retailer
-            </div>
-            <div class="nav-item" data-page="sales">
-                <i class="fas fa-receipt"></i> Record Sale
-            </div>
-            <div class="nav-item" data-page="inventory">
-                <i class="fas fa-boxes"></i> Inventory
-            </div>
-            <div class="nav-item" data-page="subscription">
-                <i class="fas fa-credit-card"></i> Plans & Billing
-            </div>
-            <div class="nav-item logout-item" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </div>
+            <div class="logo-area"><i class="fas fa-water"></i><span>WaterMall</span></div>
+            <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
+            <div class="nav-item" data-page="customers"><i class="fas fa-store"></i> Retailers</div>
+            <div class="nav-item" data-page="addCustomer"><i class="fas fa-map-marker-alt"></i> Add Retailer</div>
+            <div class="nav-item" data-page="sales"><i class="fas fa-receipt"></i> Record Sale</div>
+            <div class="nav-item" data-page="inventory"><i class="fas fa-boxes"></i> Inventory</div>
+            <div class="nav-item" data-page="subscription"><i class="fas fa-credit-card"></i> Plans & Billing</div>
+            <div class="nav-item logout-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
         </div>
         <div class="main-panel">
             <div class="top-bar">
                 <div class="page-title" id="pageTitle">Dashboard</div>
-                <div class="user-info">
-                    <span id="userName"></span>
-                    <img id="userAvatar" class="user-avatar" alt="User">
-                </div>
+                <div class="user-info"><span id="userName"></span><img id="userAvatar" class="user-avatar"></div>
             </div>
             <div id="dynamicContent"></div>
         </div>
@@ -469,44 +146,34 @@
 </div>
 
 <script>
-    // ==================== ENV CONFIG (Your exact format) ====================
+    // ==================== FIREBASE CONFIG ====================
     const ENV = {
         FIREBASE_API_KEY: "AIzaSyBZYYoNqbFPIPGWw6dkXWbrz7VrnVHWcSA",
         FIREBASE_AUTH_DOMAIN: "watermall.firebaseapp.com",
         FIREBASE_PROJECT_ID: "watermall",
         FIREBASE_STORAGE_BUCKET: "watermall.firebasestorage.app",
         FIREBASE_MSG_SENDER_ID: "1019429267262",
-        FIREBASE_APP_ID: "1:1019429267262:web:5039587eeb11aaba70ee6f",
-        PAYSTACK_PUBLIC_KEY: "{{PAYSTACK_PUBLIC_KEY}}",
-        KORA_PUBLIC_KEY: "{{KORA_PUBLIC_KEY}}"
+        FIREBASE_APP_ID: "1:1019429267262:web:5039587eeb11aaba70ee6f"
     };
 
-    // Initialize Firebase
-    const firebaseConfig = {
+    firebase.initializeApp({
         apiKey: ENV.FIREBASE_API_KEY,
         authDomain: ENV.FIREBASE_AUTH_DOMAIN,
         projectId: ENV.FIREBASE_PROJECT_ID,
         storageBucket: ENV.FIREBASE_STORAGE_BUCKET,
         messagingSenderId: ENV.FIREBASE_MSG_SENDER_ID,
         appId: ENV.FIREBASE_APP_ID
-    };
-    firebase.initializeApp(firebaseConfig);
+    });
     const auth = firebase.auth();
     const db = firebase.firestore();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
 
     let currentUser = null;
-    let currentMap = null, currentMarker = null;
+    let currentLocation = { lat: 6.5244, lng: 3.3792 };
 
-    function showToast(msg) {
-        let toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.innerText = msg;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
+    function showToast(msg) { let t = document.createElement('div'); t.className = 'toast-message'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
 
-    // Get Started + Google Sign-In
+    // Get Started
     document.getElementById('getStartedBtn').addEventListener('click', async () => {
         try {
             const result = await auth.signInWithPopup(googleProvider);
@@ -515,31 +182,22 @@
             document.getElementById('mainApp').style.display = 'block';
             await ensureUserDoc(result.user);
             loadPage('dashboard');
-        } catch (error) {
-            showToast('Sign in failed: ' + error.message);
-        }
+        } catch (error) { showToast('Sign in failed'); }
     });
 
     async function ensureUserDoc(user) {
-        const userRef = db.collection('suppliers').doc(user.uid);
-        const snap = await userRef.get();
-        if (!snap.exists) {
-            await userRef.set({
-                name: user.displayName,
-                email: user.email,
-                photo: user.photoURL,
-                createdAt: new Date(),
-                subscriptionStatus: 'inactive'
-            });
+        const ref = db.collection('suppliers').doc(user.uid);
+        if (!(await ref.get()).exists) {
+            await ref.set({ name: user.displayName, email: user.email, createdAt: new Date() });
         }
     }
 
     auth.onAuthStateChanged(async (user) => {
-        if (user && document.getElementById('mainApp').style.display === 'block') {
+        if (user && document.getElementById('mainApp').style.display !== 'none') {
             currentUser = user;
             document.getElementById('userName').innerText = user.displayName || user.email;
             document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?background=0F5B5A&color=fff&name=' + encodeURIComponent(user.displayName || 'User');
-        } else if (user && document.getElementById('heroPage').style.display !== 'none') {
+        } else if (user) {
             document.getElementById('heroPage').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             currentUser = user;
@@ -554,14 +212,11 @@
         await auth.signOut();
         document.getElementById('heroPage').style.display = 'flex';
         document.getElementById('mainApp').style.display = 'none';
-        showToast('Logged out');
     });
 
-    // Navigation
     document.querySelectorAll('.nav-item[data-page]').forEach(el => {
         el.addEventListener('click', () => {
-            const page = el.dataset.page;
-            loadPage(page);
+            loadPage(el.dataset.page);
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         });
@@ -580,7 +235,7 @@
     }
 
     async function renderDashboard(container) {
-        container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>';
+        container.innerHTML = '<div style="text-align:center; padding:1rem;">Loading...</div>';
         const uid = currentUser.uid;
         const salesSnap = await db.collection('suppliers').doc(uid).collection('sales').get();
         let bottled = 0, sachet = 0, revenue = 0, unpaid = 0;
@@ -588,50 +243,71 @@
         const recent = await db.collection('suppliers').doc(uid).collection('sales').orderBy('timestamp', 'desc').limit(5).get();
         let rows = '';
         recent.forEach(d => { const s = d.data(); rows += `<tr><td>${s.customerName}</td><td>${s.quantity} packs</td><td>₵${s.totalAmount}</td><td class="${s.unpaidAmount > 0 ? 'badge-unpaid' : 'badge-paid'}">${s.unpaidAmount > 0 ? 'Unpaid' : 'Paid'}</td></tr>`; });
-        container.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-card"><i class="fas fa-tint"></i> <h4>Bottled</h4><div class="stat-number">${bottled}</div></div>
-                <div class="stat-card"><i class="fas fa-bag-shopping"></i> <h4>Sachet</h4><div class="stat-number">${sachet}</div></div>
-                <div class="stat-card"><i class="fas fa-coins"></i> <h4>Revenue</h4><div class="stat-number">₵${revenue.toLocaleString()}</div></div>
-                <div class="stat-card"><i class="fas fa-clock"></i> <h4>Unpaid</h4><div class="stat-number">₵${unpaid.toLocaleString()}</div></div>
-            </div>
-            <div class="form-card"><h4>Recent Exports</h4><div class="table-responsive"><table><thead><tr><th>Retailer</th><th>Qty</th><th>Amount</th><th>Status</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No sales yet</td></tr>'}</tbody></table></div></div>
-        `;
+        container.innerHTML = `<div class="stats-grid"><div class="stat-card"><h4>💧 Bottled</h4><div class="stat-number">${bottled}</div></div><div class="stat-card"><h4>🧃 Sachet</h4><div class="stat-number">${sachet}</div></div><div class="stat-card"><h4>💰 Revenue</h4><div class="stat-number">₵${revenue.toLocaleString()}</div></div><div class="stat-card"><h4>⚠️ Unpaid</h4><div class="stat-number">₵${unpaid.toLocaleString()}</div></div></div><div class="form-card"><h4>Recent Sales</h4><div class="table-responsive"><table><thead><tr><th>Retailer</th><th>Qty</th><th>Amount</th><th>Status</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No sales yet</td></tr>'}</tbody></table></div></div>`;
     }
 
     async function renderCustomers(container) {
         const uid = currentUser.uid;
         const snap = await db.collection('suppliers').doc(uid).collection('customers').get();
-        let html = '<div class="form-card"><h4>👥 Retailer Directory</h4><div class="table-responsive"><table><thead><tr><th>Name</th><th>Phone</th><th>Outstanding</th><th>Action</th></tr></thead><tbody>';
+        let html = '<div class="form-card"><h4>👥 Retailers</h4><div class="table-responsive"><table><thead><tr><th>Name</th><th>Phone</th><th>Outstanding</th><th>Action</th></tr></thead><tbody>';
         snap.forEach(doc => { const c = doc.data(); html += `<tr><td>${c.name}</td><td>${c.phone || '-'}</td><td>₵${c.outstandingBalance || 0}</td><td><button class="record-sale-btn" data-id="${doc.id}">Record Sale</button></td></tr>`; });
         html += '</tbody></table></div></div>';
         container.innerHTML = html;
         document.querySelectorAll('.record-sale-btn').forEach(btn => btn.addEventListener('click', () => { loadPage('sales'); setTimeout(() => { const sel = document.getElementById('saleCustomerId'); if (sel) sel.value = btn.dataset.id; }, 300); }));
     }
 
+    // Simple working map picker (no API key required - uses OpenStreetMap static URL)
     function renderAddCustomer(container) {
-        container.innerHTML = `<div class="form-card"><h3>📍 Add Retailer</h3><form id="customerForm"><div class="form-group"><label>Full Name *</label><input id="custName" required></div><div class="form-group"><label>Phone</label><input id="custPhone"></div><div class="form-group"><label>Address</label><textarea id="custAddress"></textarea></div><div id="mapPicker" class="map-container"></div><input type="hidden" id="latField"><input type="hidden" id="lngField"><button type="submit">Save Retailer</button></form></div>`;
-        setTimeout(() => {
-            if (typeof google !== 'undefined') {
-                const mapDiv = document.getElementById('mapPicker');
-                const map = new google.maps.Map(mapDiv, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 13 });
-                let marker = null;
-                if (navigator.geolocation) navigator.geolocation.getCurrentPosition(pos => { const p = { lat: pos.coords.latitude, lng: pos.coords.longitude }; map.setCenter(p); marker = new google.maps.Marker({ position: p, map }); document.getElementById('latField').value = p.lat; document.getElementById('lngField').value = p.lng; }, () => {});
-                map.addListener('click', (e) => { if (marker) marker.setMap(null); marker = new google.maps.Marker({ position: e.latLng, map }); document.getElementById('latField').value = e.latLng.lat(); document.getElementById('lngField').value = e.latLng.lng(); });
-            }
-        }, 200);
+        container.innerHTML = `
+            <div class="form-card"><h3>📍 Add Retailer</h3>
+            <form id="customerForm">
+                <div class="form-group"><label>Full Name *</label><input id="custName" required></div>
+                <div class="form-group"><label>Phone</label><input id="custPhone"></div>
+                <div class="form-group"><label>Address</label><textarea id="custAddress"></textarea></div>
+                <div class="form-group"><label>📍 Click on map to set location</label>
+                <div id="mapPicker" class="map-picker" onclick="getUserLocationForMap()">
+                    <i class="fas fa-map-marker-alt"></i> Click to set retailer location<br>
+                    <span id="locationDisplay">No location selected</span>
+                </div></div>
+                <input type="hidden" id="latField">
+                <input type="hidden" id="lngField">
+                <button type="submit">Save Retailer</button>
+            </form></div>`;
+        
+        // Try to get user's current location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                document.getElementById('locationDisplay').innerHTML = `📍 ${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)} (your location)`;
+                document.getElementById('latField').value = currentLocation.lat;
+                document.getElementById('lngField').value = currentLocation.lng;
+            }, () => {});
+        }
+        
+        window.getUserLocationForMap = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    document.getElementById('locationDisplay').innerHTML = `📍 ${currentLocation.lat.toFixed(4)}, ${currentLocation.lng.toFixed(4)} (retailer location)`;
+                    document.getElementById('latField').value = currentLocation.lat;
+                    document.getElementById('lngField').value = currentLocation.lng;
+                    showToast('Location captured!');
+                }, () => { showToast('Could not get location. Please enter manually.'); });
+            } else { showToast('Geolocation not supported'); }
+        };
+        
         document.getElementById('customerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const uid = currentUser.uid;
-            const lat = document.getElementById('latField').value, lng = document.getElementById('lngField').value;
             await db.collection('suppliers').doc(uid).collection('customers').add({
                 name: document.getElementById('custName').value,
                 phone: document.getElementById('custPhone').value,
                 address: document.getElementById('custAddress').value,
-                location: (lat && lng) ? new firebase.firestore.GeoPoint(parseFloat(lat), parseFloat(lng)) : null,
+                lat: document.getElementById('latField').value || null,
+                lng: document.getElementById('lngField').value || null,
                 outstandingBalance: 0, createdAt: new Date()
             });
-            showToast('Retailer added');
+            showToast('Retailer added!');
             loadPage('customers');
         });
     }
@@ -641,7 +317,7 @@
         const custSnap = await db.collection('suppliers').doc(uid).collection('customers').get();
         let options = '<option value="">Select Retailer</option>';
         custSnap.forEach(d => options += `<option value="${d.id}">${d.data().name}</option>`);
-        container.innerHTML = `<div class="form-card"><h3>Record Water Sale</h3><form id="saleForm"><div class="form-group"><label>Retailer</label><select id="saleCustomerId">${options}</select></div><div class="form-group"><label>Product</label><select id="prodType"><option value="bottled">Bottled Water (pack)</option><option value="sachet">Sachet Water (pack)</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="qty" value="1"></div><div class="form-group"><label>Unit Price (₵)</label><input type="number" id="price" step="0.01" value="5.00"></div><div class="form-group"><label>Discount (₵)</label><input type="number" id="discount" value="0"></div><div class="form-group"><label>Amount Paid (₵)</label><input type="number" id="paid" value="0"></div><button type="submit">Record Sale</button></form></div>`;
+        container.innerHTML = `<div class="form-card"><h3>Record Sale</h3><form id="saleForm"><div class="form-group"><label>Retailer</label><select id="saleCustomerId">${options}</select></div><div class="form-group"><label>Product</label><select id="prodType"><option value="bottled">Bottled Water (pack)</option><option value="sachet">Sachet Water (pack)</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="qty" value="1"></div><div class="form-group"><label>Unit Price (₵)</label><input type="number" id="price" step="0.01" value="5.00"></div><div class="form-group"><label>Discount (₵)</label><input type="number" id="discount" value="0"></div><div class="form-group"><label>Amount Paid (₵)</label><input type="number" id="paid" value="0"></div><button type="submit">Record Sale</button></form></div>`;
         document.getElementById('saleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const custId = document.getElementById('saleCustomerId').value;
@@ -650,11 +326,9 @@
             const total = (qty * price) - discount, unpaid = total - paid;
             const custRef = db.collection('suppliers').doc(currentUser.uid).collection('customers').doc(custId);
             const custDoc = await custRef.get();
-            await db.collection('suppliers').doc(currentUser.uid).collection('sales').add({
-                customerId: custId, customerName: custDoc.data().name, productType: document.getElementById('prodType').value, quantity: qty, totalAmount: total, paidAmount: paid, unpaidAmount: unpaid, timestamp: new Date()
-            });
+            await db.collection('suppliers').doc(currentUser.uid).collection('sales').add({ customerId: custId, customerName: custDoc.data().name, productType: document.getElementById('prodType').value, quantity: qty, totalAmount: total, paidAmount: paid, unpaidAmount: unpaid, timestamp: new Date() });
             await custRef.update({ outstandingBalance: firebase.firestore.FieldValue.increment(unpaid) });
-            showToast('Sale recorded');
+            showToast('Sale recorded!');
             loadPage('dashboard');
         });
     }
@@ -674,7 +348,7 @@
     }
 
     function renderSubscription(container) {
-        container.innerHTML = `<div class="payment-plans"><div class="plan-card"><h3>6 Months Plan</h3><div class="price">$60 USD</div><p>₦24,000 NGN | ₵360 GHS | KES 6,000</p><div id="method6Group"><span data-method="card" class="pay-option selected">💳 Card</span><span data-method="momo" class="pay-option">📱 Mobile Money (MTN/Telecel)</span></div><button id="sub6Btn">Subscribe</button></div><div class="plan-card"><h3>12 Months Plan</h3><div class="price">$110 USD</div><p>₦44,000 NGN | ₵660 GHS | KES 11,000</p><div id="method12Group"><span data-method="card" class="pay-option selected">💳 Card</span><span data-method="momo" class="pay-option">📱 Mobile Money</span></div><button id="sub12Btn">Subscribe</button></div></div>`;
+        container.innerHTML = `<div class="payment-plans"><div class="plan-card"><h3>6 Months Plan</h3><div class="price">$60 USD</div><p>₦24,000 NGN | ₵360 GHS | KES 6,000</p><div id="method6Group"><span data-method="card" class="pay-option selected">💳 Card</span><span data-method="momo" class="pay-option">📱 Mobile Money</span></div><button id="sub6Btn">Subscribe</button></div><div class="plan-card"><h3>12 Months Plan</h3><div class="price">$110 USD</div><p>₦44,000 NGN | ₵660 GHS | KES 11,000</p><div id="method12Group"><span data-method="card" class="pay-option selected">💳 Card</span><span data-method="momo" class="pay-option">📱 Mobile Money</span></div><button id="sub12Btn">Subscribe</button></div></div>`;
         document.querySelectorAll('.pay-option').forEach(el => { el.onclick = function () { this.parentNode.querySelectorAll('.pay-option').forEach(opt => opt.classList.remove('selected')); this.classList.add('selected'); }; });
         document.getElementById('sub6Btn').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated (demo)');
         document.getElementById('sub12Btn').onclick = () => alert('✅ Paystack/Kora integration ready. Plan activated (demo)');
